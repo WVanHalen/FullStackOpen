@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import countriesService from "./services/countries";
+import axios from "axios";
 import Search from "./components/Search";
 import Content from "./components/Content";
 
@@ -9,10 +9,14 @@ const App = () => {
 
   useEffect(() => {
     console.log("Efekti");
-    if (countries)
-      countriesService.getAll().then((initialCountries) => {
-        setCountries(initialCountries);
-      });
+    if (countries) {
+      axios
+        .get("https://studies.cs.helsinki.fi/restcountries/api/all")
+        .then((response) => {
+          setCountries(response.data);
+          console.log(response.data);
+        });
+    }
   }, []);
 
   const handleSearch = (event) => {
@@ -22,7 +26,11 @@ const App = () => {
   return (
     <div>
       <Search search={search} handleSearch={handleSearch} />
-      <Content countries={countries} searchValue={search} />
+      <Content
+        countries={countries}
+        searchValue={search}
+        setSearchValue={setSearch}
+      />
     </div>
   );
 };

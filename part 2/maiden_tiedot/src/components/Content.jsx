@@ -1,8 +1,6 @@
 import Country from "./Country";
 
-const Content = ({ countries, searchValue }) => {
-  console.log(countries);
-
+const Content = ({ countries, searchValue, setSearchValue }) => {
   let searched = [];
 
   if (searchValue.length > 0) {
@@ -25,7 +23,12 @@ const Content = ({ countries, searchValue }) => {
     return (
       <div>
         {searched.map((country) => (
-          <p key={country.name.common}>{country.name.common}</p>
+          <p key={country.name.common}>
+            {country.name.common}{" "}
+            <button onClick={() => setSearchValue(country.name.common)}>
+              show
+            </button>
+          </p>
         ))}
       </div>
     );
