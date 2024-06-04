@@ -13,9 +13,20 @@ mongoose
     console.log("Error connecting to MongoDB", error.message);
   });
 
+const validateNumber = {
+  validator: (number) => {
+    return /^\d{2,3}-\d+$/.test(number);
+  },
+  msg: "invalid phone number",
+};
+
 const personSchema = new mongoose.Schema({
   name: { type: String, minlength: 3 },
-  number: String,
+  number: {
+    type: String,
+    minlength: 8,
+    validate: validateNumber,
+  },
 });
 
 personSchema.set("toJSON", {
