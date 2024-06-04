@@ -4,7 +4,6 @@ mongoose.set("strictQuery", false);
 
 const url = process.env.MONGODB_URI;
 
-console.log("Connecting to", url);
 mongoose
   .connect(url)
   .then((result) => {
@@ -15,7 +14,7 @@ mongoose
   });
 
 const personSchema = new mongoose.Schema({
-  name: String,
+  name: { type: String, minlength: 3 },
   number: String,
 });
 

@@ -20,7 +20,7 @@ const failureStyle = {
 
 const Notification = ({ message }) => {
   if (message === null) return null;
-  if (message.includes("Information")) {
+  if (message.includes("Information") || message.includes("failed")) {
     return <div style={failureStyle}>{message}</div>;
   }
   return <div style={successStyle}>{message}</div>;
