@@ -1,2 +1,2 @@
 ﻿# FullStackOpen
-This is my repository for the Full Stack Open course
+Tämä on minun repositorioni Full Stack Open -kurssia varten
