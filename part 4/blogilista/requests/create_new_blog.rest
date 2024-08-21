@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+    "title": "Susikoira Roikkuu part 2",
+    "author": "Sepi Reinikainen",
+    "url": "www.abc.fi",
+    "likes": "322"
+}
