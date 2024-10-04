@@ -55,8 +55,8 @@ describe("Testing POST method", () => {
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
-    const response = await api.get("/api/blogs");
-    assert.strictEqual(response.body.length, helper.initialBlogs.length + 1);
+    const blogsAtEnd = await helper.blogsInDb();
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1);
   });
 
   test("likes default to 0 if not given", async () => {
@@ -72,8 +72,8 @@ describe("Testing POST method", () => {
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
-    const response = await api.get("/api/blogs");
-    const addedBlog = response.body.find((r) => r.id === postResponse.body.id);
+    const blogsAtEnd = await helper.blogsInDb();
+    const addedBlog = blogsAtEnd.find((r) => r.id === postResponse.body.id);
 
     assert.strictEqual(addedBlog.likes, 0);
   });
@@ -86,8 +86,8 @@ describe("Testing POST method", () => {
 
     await api.post("/api/blogs").send(newBlog).expect(400);
 
-    const response = await api.get("/api/blogs");
-    assert.strictEqual(response.body.length, helper.initialBlogs.length);
+    const blogsAtEnd = await helper.blogsInDb();
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
   });
 
   test("if url is missing, response is 400", async () => {
@@ -98,8 +98,8 @@ describe("Testing POST method", () => {
 
     await api.post("/api/blogs").send(newBlog).expect(400);
 
-    const response = await api.get("/api/blogs");
-    assert.strictEqual(response.body.length, helper.initialBlogs.length);
+    const blogsAtEnd = await helper.blogsInDb();
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
   });
 });
 
@@ -119,8 +119,8 @@ describe("Testing DELETE method", () => {
   });
 });
 
-describe.only("Testing PUT method", () => {
-  test.only("blog likes should change", async () => {
+describe("Testing PUT method", () => {
+  test("blog likes should change", async () => {
     const blogsAtStart = await helper.blogsInDb();
     const blogToUpdate = blogsAtStart[0];
 
@@ -134,8 +134,8 @@ describe.only("Testing PUT method", () => {
       .send(updatedBlog)
       .expect(200);
 
-    const response = await api.get("/api/blogs");
-    const foundBlog = response.body.find((r) => r.id === updatedBlog.id);
+    const blogsAtEnd = await helper.blogsInDb();
+    const foundBlog = blogsAtEnd.find((r) => r.id === updatedBlog.id);
 
     assert.strictEqual(foundBlog.likes, 20500);
   });
