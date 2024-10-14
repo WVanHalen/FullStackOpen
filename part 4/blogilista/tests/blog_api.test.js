@@ -6,10 +6,15 @@ const app = require("../app");
 const api = supertest(app);
 const helper = require("./test_helper");
 const Blog = require("../models/blog");
+const User = require("../models/user");
 
 beforeEach(async () => {
   await Blog.deleteMany({});
   await Blog.insertMany(helper.initialBlogs);
+
+  await User.deleteMany({});
+
+  await helper.addLoginUser();
 });
 
 describe("testing GET:", () => {
@@ -42,6 +47,28 @@ describe("checking ID field naming:", () => {
 
 describe("Testing POST method", () => {
   test("a valid blog can be added", async () => {
+    const loggedUser = await api.post("/api/login").send(helper.loginUser);
+    const headers = { Authorization: `Bearer ${loggedUser.body.token}` };
+
+    const newBlog = {
+      title: "TestiBlogi",
+      author: "Meikäpoika",
+      url: "https://google.com/",
+      likes: 0,
+    };
+
+    await api
+      .post("/api/blogs")
+      .set(headers)
+      .send(newBlog)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    const blogsAtEnd = await helper.blogsInDb();
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1);
+  });
+
+  test("POST returns 401 if token is missing", async () => {
     const newBlog = {
       title: "TestiBlogi",
       author: "Meikäpoika",
@@ -52,14 +79,18 @@ describe("Testing POST method", () => {
     await api
       .post("/api/blogs")
       .send(newBlog)
-      .expect(201)
+      .expect(401)
       .expect("Content-Type", /application\/json/);
 
     const blogsAtEnd = await helper.blogsInDb();
-    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1);
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
   });
 
   test("likes default to 0 if not given", async () => {
+    const loggedUser = await api.post("/api/login").send(helper.loginUser);
+
+    const headers = { Authorization: `Bearer ${loggedUser.body.token}` };
+
     const newBlog = {
       title: "LikeTesti",
       author: "Meikäpoika",
@@ -68,6 +99,7 @@ describe("Testing POST method", () => {
 
     const postResponse = await api
       .post("/api/blogs")
+      .set(headers)
       .send(newBlog)
       .expect(201)
       .expect("Content-Type", /application\/json/);
@@ -79,24 +111,30 @@ describe("Testing POST method", () => {
   });
 
   test("if title is missing, response is 400", async () => {
+    const loggedUser = await api.post("/api/login").send(helper.loginUser);
+    const headers = { Authorization: `Bearer ${loggedUser.body.token}` };
+
     const newBlog = {
       author: "Meikäpoika",
       url: "https://google.com/",
     };
 
-    await api.post("/api/blogs").send(newBlog).expect(400);
+    await api.post("/api/blogs").set(headers).send(newBlog).expect(400);
 
     const blogsAtEnd = await helper.blogsInDb();
     assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
   });
 
   test("if url is missing, response is 400", async () => {
+    const loggedUser = await api.post("/api/login").send(helper.loginUser);
+    const headers = { Authorization: `Bearer ${loggedUser.body.token}` };
+
     const newBlog = {
       title: "No URL test",
       author: "Meikäpoika",
     };
 
-    await api.post("/api/blogs").send(newBlog).expect(400);
+    await api.post("/api/blogs").set(headers).send(newBlog).expect(400);
 
     const blogsAtEnd = await helper.blogsInDb();
     assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
@@ -105,14 +143,25 @@ describe("Testing POST method", () => {
 
 describe("Testing DELETE method", () => {
   test("succeeds with status code 204 if id is valid", async () => {
-    const blogsAtStart = await helper.blogsInDb();
-    const blogToDelete = blogsAtStart[0];
+    const loggedUser = await api.post("/api/login").send(helper.loginUser);
+    const headers = { Authorization: `Bearer ${loggedUser.body.token}` };
 
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+    const deleteThis = {
+      title: "Poistoon",
+      author: "Martti Suosalo",
+      url: "www.kuukuna.org",
+    };
+
+    await api.post("/api/blogs").set(headers).send(deleteThis).expect(201);
+
+    const blogsAtStart = await helper.blogsInDb();
+    const blogToDelete = blogsAtStart[blogsAtStart.length - 1];
+
+    await api.delete(`/api/blogs/${blogToDelete.id}`).set(headers).expect(204);
 
     const blogsAtEnd = await helper.blogsInDb();
 
-    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1);
+    assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1);
 
     const contents = blogsAtEnd.map((r) => r.id);
     assert(!contents.includes(blogToDelete.id));

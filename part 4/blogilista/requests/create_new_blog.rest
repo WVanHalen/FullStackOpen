@@ -1,9 +1,10 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik1hc2FNYWluaW8iLCJpZCI6IjY3MGJjZWQ2YzZkOWIyNjZiZDc0MjM1NiIsImlhdCI6MTcyODgyNzExNn0.LzT5-rjTy9lsZhq9fr14B82Y3BAq3m7b3MsdEEk8tzs
 
 {
-    "title": "Susikoira Roikkuu part 9",
+    "title": "Tämä muuten lähtee poistoon",
     "author": "Sepi Reinikainen",
     "url": "www.abc.fi",
-    "likes": "30124"
+    "likes": "3"
 }

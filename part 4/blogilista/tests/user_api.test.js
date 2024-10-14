@@ -35,6 +35,8 @@ describe.only("when there is initially one user at db", () => {
       .expect("Content-Type", /application\/json/);
 
     const usersAtEnd = await helper.usersInDb();
+    console.log("Lopussa", usersAtEnd);
+    console.log("Alussa", usersAtStart);
     assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1);
 
     const usernames = usersAtEnd.map((u) => u.username);
