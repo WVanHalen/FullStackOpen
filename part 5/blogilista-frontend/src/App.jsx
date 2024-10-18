@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Notification from "./components/Notification";
+import CreateForm from "./components/CreateForm";
+import Togglable from "./components/Togglable";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -11,13 +13,15 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
+  const [refreshBlog, setRefreshBlog] = useState(false);
+  const blogFormRef = useRef();
 
   useEffect(() => {
-    blogService.getAll().then((initialBlogs) => setBlogs(initialBlogs));
-  }, []);
+    blogService.getAll().then((initialBlogs) => {
+      initialBlogs.sort((a, b) => b.likes - a.likes);
+      setBlogs(initialBlogs);
+    });
+  }, [refreshBlog]);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
@@ -55,31 +59,42 @@ const App = () => {
     window.location.reload();
   };
 
-  const handleNewBlog = async (event) => {
-    event.preventDefault();
+  const addBlog = async (blogObject) => {
     try {
-      const blog = await blogService.create({
-        title,
-        author,
-        url,
-      });
+      blogFormRef.current.toggleVisibility();
+      const blog = await blogService.create(blogObject);
 
       setBlogs(blogs.concat(blog));
 
       setMessage(`A new blog ${blog.title} by ${blog.author} added`);
+
       setTimeout(() => {
         setMessage(null);
       }, 5000);
     } catch (exception) {
-      setErrorMessage(`Failed to add blog ${title}`);
+      setErrorMessage(`Failed to add blog ${blogObject.title}`);
       setTimeout(() => {
         setErrorMessage(null);
       }, 5000);
     }
+  };
 
-    setTitle("");
-    setAuthor("");
-    setUrl("");
+  const updateBlog = async (id, blogObject) => {
+    try {
+      const updatedBlog = await blogService.update(id, blogObject);
+      setMessage(`Blog ${updatedBlog.title} updated successfully`);
+
+      setRefreshBlog(!refreshBlog);
+
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
+    } catch (exception) {
+      setErrorMessage(`Failed to update blog ${blogObject.title}`);
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
   };
 
   const loginForm = () => (
@@ -111,42 +126,6 @@ const App = () => {
     </div>
   );
 
-  const createForm = () => (
-    <div>
-      <h2>create new</h2>
-      <form onSubmit={handleNewBlog}>
-        <div>
-          title:
-          <input
-            type="text"
-            value={title}
-            name="Title"
-            onChange={({ target }) => setTitle(target.value)}
-          />
-        </div>
-        <div>
-          author:
-          <input
-            type="text"
-            value={author}
-            name="Author"
-            onChange={({ target }) => setAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url:
-          <input
-            type="text"
-            value={url}
-            name="Url"
-            onChange={({ target }) => setUrl(target.value)}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>
-    </div>
-  );
-
   const blogForm = () => (
     <div>
       <h2>blogs</h2>
@@ -158,9 +137,11 @@ const App = () => {
         <button onClick={handleLogout}>logout</button>
         <br /> <br />
       </>
-      {createForm()}
+      <Togglable buttonLabel="new blog" ref={blogFormRef}>
+        <CreateForm createBlog={addBlog} />
+      </Togglable>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
       ))}
     </div>
   );
