@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const Blog = ({ blog, updateBlog }) => {
+const Blog = ({ blog, user, updateBlog, deleteBlog }) => {
   const [visible, setVisible] = useState(false);
   const showWhenVisible = { display: visible ? "" : "none" };
 
@@ -18,12 +18,21 @@ const Blog = ({ blog, updateBlog }) => {
     marginBottom: 5,
   };
 
-  const addLike = () => {
+  const deleteButtonStyle = {
+    backgroundColor: "royalblue",
+    borderRadius: "6px",
+  };
+
+  const handleLike = () => {
     const blogObject = {
       ...blog,
       likes: blog.likes + 1,
     };
     updateBlog(blog.id, blogObject);
+  };
+
+  const handleDelete = () => {
+    deleteBlog(blog);
   };
 
   return (
@@ -36,9 +45,16 @@ const Blog = ({ blog, updateBlog }) => {
         {blog.url}
         <br></br>
         {blog.likes}
-        <button onClick={addLike}>like</button>
+        <button onClick={handleLike}>like</button>
         <br></br>
         {blog.user ? blog.user.name : ""}
+        {blog.user && blog.user.username === user.username && (
+          <div>
+            <button style={deleteButtonStyle} onClick={handleDelete}>
+              remove
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

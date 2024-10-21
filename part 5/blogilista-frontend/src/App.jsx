@@ -13,7 +13,7 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [refreshBlog, setRefreshBlog] = useState(false);
+  const [refreshAllBlogs, setRefreshAllBlogs] = useState(false);
   const blogFormRef = useRef();
 
   useEffect(() => {
@@ -21,7 +21,7 @@ const App = () => {
       initialBlogs.sort((a, b) => b.likes - a.likes);
       setBlogs(initialBlogs);
     });
-  }, [refreshBlog]);
+  }, [refreshAllBlogs]);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
@@ -84,7 +84,7 @@ const App = () => {
       const updatedBlog = await blogService.update(id, blogObject);
       setMessage(`Blog ${updatedBlog.title} updated successfully`);
 
-      setRefreshBlog(!refreshBlog);
+      setRefreshAllBlogs(!refreshAllBlogs);
 
       setTimeout(() => {
         setMessage(null);
@@ -94,6 +94,28 @@ const App = () => {
       setTimeout(() => {
         setErrorMessage(null);
       }, 5000);
+    }
+  };
+
+  const deleteBlog = async (blogObject) => {
+    if (
+      window.confirm(`Remove blog ${blogObject.title} by ${blogObject.author}?`)
+    ) {
+      try {
+        await blogService.remove(blogObject.id);
+        setMessage(`Blog ${blogObject.title} removed successfully`);
+
+        setRefreshAllBlogs(!refreshAllBlogs);
+
+        setTimeout(() => {
+          setMessage(null);
+        }, 5000);
+      } catch (exception) {
+        setErrorMessage(`Failed to delete blog ${blogObject.title}`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      }
     }
   };
 
@@ -141,7 +163,13 @@ const App = () => {
         <CreateForm createBlog={addBlog} />
       </Togglable>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          user={user}
+          updateBlog={updateBlog}
+          deleteBlog={deleteBlog}
+        />
       ))}
     </div>
   );
