@@ -23,13 +23,13 @@ const Notification = ({ message, errorMessage }) => {
     return null;
   } else if (message) {
     return (
-      <div id="success" style={success}>
+      <div className="success" style={success}>
         {message}
       </div>
     );
   } else {
     return (
-      <div id="failure" style={failure}>
+      <div className="failure" style={failure}>
         {errorMessage}
       </div>
     );
