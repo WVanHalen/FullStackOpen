@@ -1,27 +1,18 @@
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { likeBlog } from "../reducers/blogReducer";
 import { deleteBlog } from "../reducers/blogReducer";
 import { setNotification } from "../reducers/notificationReducer";
+import { useParams, useNavigate } from "react-router-dom";
 
-const Blog = ({ blog }) => {
-  const [visible, setVisible] = useState(false);
-  const showWhenVisible = { display: visible ? "" : "none" };
+const Blog = () => {
   const dispatch = useDispatch();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.login);
 
-  const toggleVisibility = () => {
-    setVisible(!visible);
-  };
-
-  const buttonLabel = visible ? "hide" : "view";
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  };
+  const blog = useSelector((state) =>
+    state.blogs.find((blog) => blog.id === id)
+  );
 
   const deleteButtonStyle = {
     backgroundColor: "royalblue",
@@ -43,33 +34,34 @@ const Blog = ({ blog }) => {
     try {
       dispatch(deleteBlog(blog.id));
       dispatch(setNotification(`Blog ${blog.title} removed`, 5));
+      navigate("/");
     } catch (e) {
       setNotification(`Error: Failed to delete blog ${blog.title}`, 5);
     }
   };
 
+  if (!blog) return null;
+
   return (
-    <div style={blogStyle} className="blog">
+    <div className="blog">
+      <h3>
+        {blog.title} {blog.author}
+      </h3>
+      {blog.url}
       <div>
-        <span>{blog.title} </span>
-        <span>{blog.author} </span>
-        <button onClick={toggleVisibility}>{buttonLabel}</button>
+        <span>likes {blog.likes}</span>
+        <button onClick={handleLike}>like</button>
       </div>
-      {visible && (
-        <>
-          {blog.url}
-          <div>
-            <span>likes {blog.likes}</span>
-            <button onClick={handleLike}>like</button>
-          </div>
-          <div>{blog.user ? blog.user.name : ""}</div>
-          <div>
-            <button style={deleteButtonStyle} onClick={handleDelete}>
-              remove
-            </button>
-          </div>
-        </>
-      )}
+      <div>
+        {blog.user.name ? `added by ${blog.user.name}` : "added by No name"}
+      </div>
+      <div>
+        {user.username === blog.user.username ? (
+          <button style={deleteButtonStyle} onClick={handleDelete}>
+            remove
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 };
