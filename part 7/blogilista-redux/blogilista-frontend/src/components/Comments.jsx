@@ -1,5 +1,6 @@
 import { useDispatch } from "react-redux";
 import { addNewComment } from "../reducers/blogReducer";
+import { Form, Button, ListGroup, ListGroupItem } from "react-bootstrap";
 
 const Comments = ({ blog }) => {
   const dispatch = useDispatch();
@@ -13,16 +14,23 @@ const Comments = ({ blog }) => {
 
   return (
     <div>
-      <h3>comments</h3>
-      <form onSubmit={handleSubmit}>
-        <input name="comment" />
-        <button type="submit">Add comment</button>
-      </form>
-      <ul>
-        {blog.comments.map((comment) => (
-          <li key={comment.id}>{comment}</li>
+      <h3>Comments</h3>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group>
+          <Form.Label>Comment: </Form.Label>
+          <Form.Control type="text" name="comment" />
+        </Form.Group>
+        <div className="my-3">
+          <Button variant="primary" type="submit">
+            Add comment
+          </Button>
+        </div>
+      </Form>
+      <ListGroup>
+        {blog.comments.map((comment, index) => (
+          <ListGroupItem key={index}>{comment}</ListGroupItem>
         ))}
-      </ul>
+      </ListGroup>
     </div>
   );
 };

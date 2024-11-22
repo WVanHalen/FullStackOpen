@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import blogService from "../services/blogs";
+import { setNotification } from "./notificationReducer";
 
 const blogSlice = createSlice({
   name: "blogs",
@@ -34,25 +35,54 @@ export const initializeBlogs = () => {
 
 export const addBlog = (content) => {
   return async (dispatch) => {
-    const newBlog = await blogService.create(content);
-    dispatch(appendBlog(newBlog));
+    try {
+      const newBlog = await blogService.create(content);
+      dispatch(appendBlog(newBlog));
+      dispatch(
+        setNotification(
+          `A new blog ${newBlog.title} by ${newBlog.author} added`,
+          5
+        )
+      );
+    } catch (e) {
+      console.log(e);
+      dispatch(
+        setNotification(`Error: Failed to add blog ${content.title}`, 5)
+      );
+    }
   };
 };
 
 export const likeBlog = (blog) => {
   return async (dispatch) => {
-    const updatedBlog = await blogService.update({
-      ...blog,
-      likes: blog.likes + 1,
-    });
-    dispatch(updateBlog(updatedBlog));
+    try {
+      const updatedBlog = await blogService.update({
+        ...blog,
+        likes: blog.likes + 1,
+      });
+      dispatch(updateBlog(updatedBlog));
+      dispatch(
+        setNotification(`Blog ${updatedBlog.title} updated successfully`, 5)
+      );
+    } catch (e) {
+      console.log(e);
+      dispatch(
+        setNotification(`Error: Failed to update blog ${blog.title}`, 5)
+      );
+    }
   };
 };
 
-export const deleteBlog = (id) => {
+export const deleteBlog = (id, name) => {
   return async (dispatch) => {
-    const deletedBlog = await blogService.remove(id);
-    dispatch(removeBlog(id));
+    try {
+      await blogService.remove(id);
+      dispatch(removeBlog(id));
+      dispatch(setNotification(`Blog ${name} removed`, 5));
+    } catch (e) {
+      console.log(e);
+      setNotification(`Error: Failed to delete blog ${name}`, 5);
+    }
   };
 };
 
@@ -61,8 +91,9 @@ export const addNewComment = (id, comment) => {
     try {
       const updatedBlog = await blogService.addComment(id, comment);
       dispatch(updateBlog(updatedBlog));
+      dispatch(setNotification("New comment added", 5));
     } catch (error) {
-      dispatch(setNotification(parseErrorMessage(error), "error"));
+      dispatch(setNotification("Error: Failed to add a new comment", 5));
     }
   };
 };

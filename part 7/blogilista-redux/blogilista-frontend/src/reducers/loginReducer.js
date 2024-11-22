@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import loginService from "../services/login";
 import blogService from "../services/blogs";
+import { setNotification } from "./notificationReducer";
 
 const loginSlice = createSlice({
   name: "user",
@@ -35,8 +36,10 @@ export const login = (content) => {
       window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
       blogService.setToken(user.token);
       dispatch(setUser(user));
+      dispatch(setNotification(`Welcome ${user.username}`, 5));
     } catch (e) {
       console.log(e);
+      dispatch(setNotification("Error: Wrong username or password", 5));
     }
   };
 };

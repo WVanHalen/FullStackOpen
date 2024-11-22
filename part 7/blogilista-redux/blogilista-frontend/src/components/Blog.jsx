@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import { likeBlog } from "../reducers/blogReducer";
 import { deleteBlog } from "../reducers/blogReducer";
-import { setNotification } from "../reducers/notificationReducer";
 import { useParams, useNavigate } from "react-router-dom";
+import { Button } from "react-bootstrap";
 import Comments from "./Comments";
 
 const Blog = () => {
@@ -15,30 +15,13 @@ const Blog = () => {
     state.blogs.find((blog) => blog.id === id)
   );
 
-  const deleteButtonStyle = {
-    backgroundColor: "royalblue",
-    borderRadius: "6px",
-  };
-
   const handleLike = () => {
-    try {
-      dispatch(likeBlog(blog));
-      dispatch(setNotification(`Blog ${blog.title} updated successfully`, 5));
-    } catch (exception) {
-      dispatch(
-        setNotification(`Error: Failed to update blog ${blog.title}`, 5)
-      );
-    }
+    dispatch(likeBlog(blog));
   };
 
   const handleDelete = () => {
-    try {
-      dispatch(deleteBlog(blog.id));
-      dispatch(setNotification(`Blog ${blog.title} removed`, 5));
-      navigate("/");
-    } catch (e) {
-      setNotification(`Error: Failed to delete blog ${blog.title}`, 5);
-    }
+    dispatch(deleteBlog(blog.id, blog.title));
+    navigate("/");
   };
 
   if (!blog) return null;
@@ -50,15 +33,17 @@ const Blog = () => {
       </h3>
       {blog.url}
       <div>
-        <span>likes {blog.likes}</span>
-        <button onClick={handleLike}>like</button>
+        <span style={{ display: "inline-block", marginRight: "5px" }}>
+          likes {blog.likes}
+        </span>
+        <Button onClick={handleLike}>Like</Button>
       </div>
-      <div>added by {blog.user.name}</div>
-      <div>
+      <div>added by {blog.user.name ? blog.user.name : "Anonymous"}</div>
+      <div className="my-3">
         {user.username === blog.user.username ? (
-          <button style={deleteButtonStyle} onClick={handleDelete}>
-            remove
-          </button>
+          <Button variant="danger" onClick={handleDelete}>
+            Remove
+          </Button>
         ) : null}
       </div>
       <Comments blog={blog} />

@@ -1,21 +1,19 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { initializeBlogs } from "./reducers/blogReducer";
 import { initializeUser } from "./reducers/loginReducer";
 import { initializeUsers } from "./reducers/userReducer";
-import Notification from "./components/Notification";
-import BlogForm from "./components/BlogForm";
-import Blog from "./components/Blog";
-import LoginForm from "./components/LoginForm";
-import Togglable from "./components/Togglable";
-import BlogList from "./components/BlogList";
-import Users from "./components/Users";
-import User from "./components/User";
-import Menu from "./components/Menu";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route } from "react-router-dom";
 
+import Home from "./components/Home";
+import Notification from "./components/Notification";
+import Blog from "./components/Blog";
+import LoginForm from "./components/LoginForm";
+import Users from "./components/Users";
+import User from "./components/User";
+import Menu from "./components/Menu";
+
 const App = () => {
-  const blogFormRef = useRef();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.login);
 
@@ -25,26 +23,15 @@ const App = () => {
     dispatch(initializeUsers());
   }, [dispatch]);
 
-  const Home = () => {
-    return (
-      <div>
-        <Togglable buttonLabel="new blog" ref={blogFormRef}>
-          <BlogForm />
-        </Togglable>
-        <BlogList />
-      </div>
-    );
-  };
-
   return (
-    <div>
+    <div className="container">
       {!user ? (
         <LoginForm />
       ) : (
         <div>
-          <Menu />
-          <h1>blog app</h1>
           <Notification />
+          <Menu />
+          <h1>Blog app</h1>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/users" element={<Users />} />

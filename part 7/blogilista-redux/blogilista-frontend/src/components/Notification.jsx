@@ -1,41 +1,14 @@
 import { useSelector } from "react-redux";
-
-const success = {
-  color: "green",
-  background: "lightgrey",
-  fontSize: 20,
-  borderStyle: "solid",
-  borderRadius: 5,
-  padding: 10,
-  marginBottom: 10,
-};
-
-const failure = {
-  color: "red",
-  background: "lightgrey",
-  fontSize: 20,
-  borderStyle: "solid",
-  borderRadius: 5,
-  padding: 10,
-  marginBottom: 10,
-};
+import { Alert } from "react-bootstrap";
 
 const Notification = () => {
   const notification = useSelector((state) => state.notification);
   if (notification === "") {
     return null;
   } else if (notification.includes("Error")) {
-    return (
-      <div className="failure" style={failure}>
-        {notification}
-      </div>
-    );
+    return <Alert variant="danger">{notification}</Alert>;
   } else {
-    return (
-      <div className="success" style={success}>
-        {notification}
-      </div>
-    );
+    return <Alert variant="success">{notification}</Alert>;
   }
 };
 

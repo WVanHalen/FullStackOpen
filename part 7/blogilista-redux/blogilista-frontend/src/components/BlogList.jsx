@@ -1,28 +1,27 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { Table } from "react-bootstrap";
 
 const BlogList = () => {
   const blogs = useSelector((state) => state.blogs);
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
   return (
     <div>
-      {[...blogs]
-        .sort((a, b) => b.votes - a.votes)
-        .map((blog) => (
-          <Link to={`/blogs/${blog.id}`}>
-            <div style={blogStyle}>
-              {blog.title} by {blog.author}
-            </div>
-          </Link>
-        ))}
+      <Table striped>
+        <tbody>
+          {[...blogs]
+            .sort((a, b) => b.votes - a.votes)
+            .map((blog) => (
+              <tr key={blog.id}>
+                <td>
+                  <Link to={`/blogs/${blog.id}`}>
+                    {blog.title} by {blog.author}
+                  </Link>
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </Table>
     </div>
   );
 };

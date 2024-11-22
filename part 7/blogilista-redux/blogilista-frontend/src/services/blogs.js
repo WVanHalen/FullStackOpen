@@ -45,7 +45,7 @@ const getComments = async (id) => {
 };
 
 const addComment = async (id, content) => {
-  const comment = { content, id: (1000 * Math.random()).toFixed(0) };
+  const comment = { content };
   const response = await axios.post(`${baseUrl}/${id}/comments`, comment);
   return response.data;
 };

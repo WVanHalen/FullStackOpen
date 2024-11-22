@@ -1,72 +1,47 @@
-import { useState } from "react";
 import { addBlog } from "../reducers/blogReducer";
 import { useDispatch } from "react-redux";
-import { setNotification } from "../reducers/notificationReducer";
+import { Form, Button } from "react-bootstrap";
 
 const BlogForm = () => {
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
   const dispatch = useDispatch();
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const newBlog = {
-      title: title,
-      author: author,
-      url: url,
+      title: event.target.title.value,
+      author: event.target.author.value,
+      url: event.target.url.value,
     };
 
-    try {
-      dispatch(addBlog(newBlog));
-    } catch (exception) {
-      dispatch(
-        setNotification(`Error: Failed to add blog ${blogObject.title}`, 5)
-      );
-    }
+    dispatch(addBlog(newBlog));
 
-    setTitle("");
-    setAuthor("");
-    setUrl("");
-    dispatch(setNotification(`A new blog ${title} by ${author} added`, 5));
+    event.target.title.value = "";
+    event.target.author.value = "";
+    event.target.url.value = "";
   };
 
   return (
     <div>
-      <h2>create new</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          title:
-          <input
-            data-testid="title"
-            type="text"
-            value={title}
-            name="title"
-            onChange={(event) => setTitle(event.target.value)}
-          />
+      <h2>Add blog</h2>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group>
+          <Form.Label>Title:</Form.Label>
+          <Form.Control data-testid="title" type="text" name="title" />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Author:</Form.Label>
+          <Form.Control data-testid="author" type="text" name="author" />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Url:</Form.Label>
+          <Form.Control data-testid="url" type="text" name="url" />
+        </Form.Group>
+        <div className="my-3">
+          <Button variant="primary" type="submit">
+            Create
+          </Button>
         </div>
-        <div>
-          author:
-          <input
-            data-testid="author"
-            type="text"
-            value={author}
-            name="author"
-            onChange={(event) => setAuthor(event.target.value)}
-          />
-        </div>
-        <div>
-          url:
-          <input
-            data-testid="url"
-            type="text"
-            value={url}
-            name="url"
-            onChange={(event) => setUrl(event.target.value)}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>
+      </Form>
     </div>
   );
 };
