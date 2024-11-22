@@ -3,6 +3,7 @@ import { likeBlog } from "../reducers/blogReducer";
 import { deleteBlog } from "../reducers/blogReducer";
 import { setNotification } from "../reducers/notificationReducer";
 import { useParams, useNavigate } from "react-router-dom";
+import Comments from "./Comments";
 
 const Blog = () => {
   const dispatch = useDispatch();
@@ -52,9 +53,7 @@ const Blog = () => {
         <span>likes {blog.likes}</span>
         <button onClick={handleLike}>like</button>
       </div>
-      <div>
-        {blog.user.name ? `added by ${blog.user.name}` : "added by No name"}
-      </div>
+      <div>added by {blog.user.name}</div>
       <div>
         {user.username === blog.user.username ? (
           <button style={deleteButtonStyle} onClick={handleDelete}>
@@ -62,6 +61,7 @@ const Blog = () => {
           </button>
         ) : null}
       </div>
+      <Comments blog={blog} />
     </div>
   );
 };

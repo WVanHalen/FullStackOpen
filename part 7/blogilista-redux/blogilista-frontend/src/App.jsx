@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { initializeBlogs } from "./reducers/blogReducer";
-import { initializeUser, logout } from "./reducers/loginReducer";
+import { initializeUser } from "./reducers/loginReducer";
 import { initializeUsers } from "./reducers/userReducer";
 import Notification from "./components/Notification";
 import BlogForm from "./components/BlogForm";
@@ -12,7 +12,7 @@ import Users from "./components/Users";
 import User from "./components/User";
 import Menu from "./components/Menu";
 import { useDispatch, useSelector } from "react-redux";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 const App = () => {
   const blogFormRef = useRef();
@@ -25,38 +25,35 @@ const App = () => {
     dispatch(initializeUsers());
   }, [dispatch]);
 
-  const handleLogout = () => {
-    dispatch(logout());
-  };
-
   const Home = () => {
     return (
       <div>
-        {!user ? (
-          <LoginForm />
-        ) : (
-          <div>
-            <Togglable buttonLabel="new blog" ref={blogFormRef}>
-              <BlogForm />
-            </Togglable>
-            <BlogList />
-          </div>
-        )}
+        <Togglable buttonLabel="new blog" ref={blogFormRef}>
+          <BlogForm />
+        </Togglable>
+        <BlogList />
       </div>
     );
   };
 
   return (
     <div>
-      <Menu />
-      <h1>blog app</h1>
-      <Notification />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/users/:id" element={<User />} />
-        <Route path="/blogs/:id" element={<Blog />} />
-      </Routes>
+      {!user ? (
+        <LoginForm />
+      ) : (
+        <div>
+          <Menu />
+          <h1>blog app</h1>
+          <Notification />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/users/:id" element={<User />} />
+            <Route path="/blogs/:id" element={<Blog />} />
+            <Route path="/login" element={<LoginForm />} />
+          </Routes>
+        </div>
+      )}
     </div>
   );
 };
