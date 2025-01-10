@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useQuery } from "@apollo/client";
+import EditBirthyear from "./EditBirthyear";
 import { ALL_AUTHORS } from "../queries";
 
 const Authors = (props) => {
@@ -34,6 +35,7 @@ const Authors = (props) => {
           ))}
         </tbody>
       </table>
+      <EditBirthyear authors={authors} />
     </div>
   );
 };
