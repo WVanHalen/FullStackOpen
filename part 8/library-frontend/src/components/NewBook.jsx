@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useMutation } from "@apollo/client";
-import { ALL_AUTHORS, ALL_BOOKS, ADD_BOOK } from "../queries";
+import { ALL_AUTHORS, ALL_BOOKS, ADD_BOOK, ALL_GENRES } from "../queries";
 
 import { useState } from "react";
 
@@ -17,6 +17,29 @@ const NewBook = (props) => {
 
       if (!bookData) {
         return;
+      }
+
+      if (bookData?.genres.length > 0) {
+        const allGenres = cache.readQuery({ query: ALL_GENRES });
+
+        if (allGenres?.allGenres) {
+          const allGenresData = [...allGenres.allGenres];
+
+          bookData.genres.forEach((genre) => {
+            if (!allGenresData.includes(genre)) {
+              allGenresData.push(genre);
+            }
+          });
+
+          if (allGenresData.length > allGenres.allGenres.length) {
+            cache.writeQuery({
+              query: ALL_GENRES,
+              data: {
+                allGenres: allGenresData.sort(),
+              },
+            });
+          }
+        }
       }
 
       if (bookData?.author) {
@@ -92,12 +115,6 @@ const NewBook = (props) => {
           }
         });
       }
-
-      const allBooksData = cache.readQuery({ query: ALL_BOOKS });
-      cache.writeQuery({
-        query: ALL_BOOKS,
-        data: { allBooks: allBooksData.allBooks.concat(bookData) },
-      });
     },
   });
 

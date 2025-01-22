@@ -54,6 +54,7 @@ const typeDefs = `
         authorCount: Int!
         allBooks(author: String, genre: String): [Book]!
         allAuthors: [Author]!
+        allGenres: [String]!
         me: User
     }
 `;

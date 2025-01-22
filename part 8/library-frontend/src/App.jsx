@@ -4,8 +4,8 @@ import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import Login from "./components/Login";
 import Recommend from "./components/Recommend";
-import { useApolloClient, useQuery } from "@apollo/client";
-import { ME } from "./queries";
+import { useApolloClient, useQuery, useSubscription } from "@apollo/client";
+import { ME, BOOK_ADDED } from "./queries";
 
 const App = () => {
   const [page, setPage] = useState("authors");
@@ -15,6 +15,15 @@ const App = () => {
     skip: !localStorage.getItem("library-user-token"),
   });
   const favoriteGenre = data?.me?.favoriteGenre;
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data }) => {
+      const addedBook = data.data.bookAdded;
+      window.alert(
+        `New book ${addedBook.title} by ${addedBook.author.name} added`
+      );
+    },
+  });
 
   const logout = () => {
     setToken(null);

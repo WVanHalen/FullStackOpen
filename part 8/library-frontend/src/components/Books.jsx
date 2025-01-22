@@ -1,16 +1,16 @@
 /* eslint-disable react/prop-types */
 import { useQuery } from "@apollo/client";
-import { ALL_BOOKS } from "../queries";
+import { ALL_BOOKS, ALL_GENRES } from "../queries";
 import { useState } from "react";
 
 const Books = (props) => {
   const [chosenGenre, setChosenGenre] = useState("");
-  //This for filtered books
+
   const result = useQuery(ALL_BOOKS, {
     variables: { genre: chosenGenre },
   });
-  //And this for every book in library, for extracting the genres
-  const everyBook = useQuery(ALL_BOOKS);
+
+  const genreResult = useQuery(ALL_GENRES);
 
   if (!props.show) {
     return null;
@@ -21,10 +21,8 @@ const Books = (props) => {
   }
 
   const books = result.data.allBooks;
-  // Get all genres
-  const allGenres = everyBook.data.allBooks.flatMap((book) => book.genres);
-  // Get the unique genres from all
-  const genres = [...new Set(allGenres)];
+
+  const genres = genreResult.data.allGenres;
 
   return (
     <div>

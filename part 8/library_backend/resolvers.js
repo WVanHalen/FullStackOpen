@@ -25,6 +25,14 @@ const resolvers = {
       return Book.find({}).populate("author");
     },
     allAuthors: async () => Author.find({}),
+    allGenres: async () => {
+      const books = await Book.find({});
+      const genres = new Set();
+      books.forEach((book) => {
+        book.genres.forEach((genre) => genres.add(genre));
+      });
+      return Array.from(genres).sort();
+    },
     me: (root, args, context) => {
       return context.currentUser;
     },
