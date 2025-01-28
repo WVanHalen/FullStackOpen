@@ -58,14 +58,18 @@ const calculateExercises = (exercises: number[], target: number): Result => {
   };
 };
 
-try {
-  const { exercises, target } = parseArguments(process.argv);
-  console.log(exercises, target);
-  console.log(calculateExercises(exercises, target));
-} catch (error: unknown) {
-  let errorMessage = "Something went wrong";
-  if (error instanceof Error) {
-    errorMessage += error.message;
+if (require.main === module) {
+  try {
+    const { exercises, target } = parseArguments(process.argv);
+    console.log(exercises, target);
+    console.log(calculateExercises(exercises, target));
+  } catch (error: unknown) {
+    let errorMessage = "Something went wrong";
+    if (error instanceof Error) {
+      errorMessage += error.message;
+    }
+    console.log(errorMessage);
   }
-  console.log(errorMessage);
 }
+
+export default calculateExercises;
