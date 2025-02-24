@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { DiaryEntry } from "./types";
 import { getDiaryEntries, createEntry } from "./services/diaryService";
+import axios from "axios";
 
 function App() {
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
@@ -8,19 +9,35 @@ function App() {
   const [visibility, setVisibility] = useState<string>("");
   const [weather, setWeather] = useState<string>("");
   const [comment, setComment] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const visibilities = ["great", "good", "ok", "poor"];
+  const weathers = ["sunny", "rainy", "cloudy", "stormy", "windy"];
 
   useEffect(() => {
     getDiaryEntries().then((entries) => {
-      console.log(entries);
       setDiaryEntries(entries);
     });
   }, []);
 
   const handleSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    createEntry({ date, visibility, weather, comment }).then((data) => {
-      setDiaryEntries(diaryEntries.concat(data));
-    });
+    try {
+      createEntry({ date, visibility, weather, comment }).then((data) => {
+        setDiaryEntries(diaryEntries.concat(data));
+      });
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        setError(error.response.data);
+        setTimeout(() => {
+          setError("");
+        }, 5000);
+      } else {
+        setError("Unknown error");
+        setTimeout(() => {
+          setError("");
+        }, 5000);
+      }
+    }
 
     setDate("");
     setVisibility("");
@@ -31,10 +48,18 @@ function App() {
   return (
     <>
       <h2>Add new entry</h2>
+      {error && (
+        <p
+          style={{ color: "red", fontSize: 20, padding: 10, marginBottom: 10 }}
+        >
+          {error}
+        </p>
+      )}
       <form onSubmit={handleSubmit}>
         <div>
           <label style={{ display: "inline-block", width: "65px" }}>Date</label>
           <input
+            type="date"
             value={date}
             onChange={(event) => setDate(event.target.value)}
           />
@@ -43,19 +68,41 @@ function App() {
           <label style={{ display: "inline-block", width: "65px" }}>
             Visibility
           </label>
-          <input
-            value={visibility}
-            onChange={(event) => setVisibility(event.target.value)}
-          />
+          {visibilities.map((option) => (
+            <span key={option}>
+              <label>{option}</label>
+              <input
+                type="radio"
+                id={option}
+                name={option}
+                value={option}
+                checked={option === visibility}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setVisibility(event.target.value)
+                }
+              />
+            </span>
+          ))}
         </div>
         <div>
           <label style={{ display: "inline-block", width: "65px" }}>
             Weather
           </label>
-          <input
-            value={weather}
-            onChange={(event) => setWeather(event.target.value)}
-          />
+          {weathers.map((option) => (
+            <span key={option}>
+              <label>{option}</label>
+              <input
+                type="radio"
+                id={option}
+                name={option}
+                value={option}
+                checked={option === weather}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setWeather(event.target.value)
+                }
+              />
+            </span>
+          ))}
         </div>
         <div>
           <label style={{ display: "inline-block", width: "65px" }}>
